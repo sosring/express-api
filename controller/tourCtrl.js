@@ -23,10 +23,6 @@ exports.checkBody = (req, res, next) => {
         message: 'Mising name or price'
       })
   }
-  res.status(201)
-   .json({
-    status: 'success'
-  })
   next()
 }
 
@@ -69,21 +65,11 @@ exports.createTour = (req, res) => {
   }
   tours.push(newTour)
 
-  fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    err => {
-
-    if(err) {
-      console.log(err)
-      return
-    }
-
-    res.status(201)
-      .json({
-        status: 'success',
-        data: tours
-      })
-  })
+  res.status(201)
+    .json({
+      status: 'success',
+      data: tours
+    })
 }
 
 // PATCH
