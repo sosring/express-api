@@ -1,45 +1,25 @@
-const fs = require('fs')
-const tours = JSON.parse(fs.readFileSync(`./dev-data/data/tours-simple.json`))
+const Tour = require('../models/tourModel')
 
 // MiddleWare
-exports.checkId = (req, res, next, val) => {
-  const tour = tours.find(t => t.id === parseInt(req.params.id))
-
-  if(!tour) {
-    return res.status(404)
-      .json({
-        status: 'fail',
-        message: "Indvalid Id"
-     })
-  }
+exports.checkId = async (req, res, next, val) => {
   next()
 }
-
-exports.checkBody = (req, res, next) => {
-  if(!req.body.name || !req.body.price) {
-    return res.status(400)
-      .json({
-        status: 'fail',
-        message: 'Mising name or price'
-      })
-  }
-  next()
-}
-
 
 // GET 
-exports.getAllTours = (req, res) => {
-  console.log(req.reqestTime)
+exports.getAllTours = async (req, res) => {
+
+  const tours = await Tour.find()
+
   res.status(200)
    .json({
      status: 'success',
      results: tours.length, 
-     data: tours 
+     data: tours
    })
 }
 
-exports.getTour = (req, res) => {
-  const tour = tours.find(t => t.id === parseInt(req.params.id))
+exports.getTour = async (req, res) => {
+  const tour = await Tour.find({_id: req.params.id}) 
 
   if(!tour) {
     return res.status(404)
@@ -57,54 +37,36 @@ exports.getTour = (req, res) => {
 }
 
 // POST 
-exports.createTour = (req, res) => {
+exports.createTour = async (req, res) => {
 
-  const newTour = {
-    id: (tours.length - 1) + 1,
-    body: req.body
-  }
-  tours.push(newTour)
-
+  const newTour = await Tour.create(req.body)
   res.status(201)
     .json({
       status: 'success',
-      data: tours
+      data: newTour
     })
 }
 
 // PATCH
-exports.patchTour = (req, res) => {
-  const tour = tours.find(t => t.id === parseInt(req.params.id))
+exports.updateTour = async (req, res) => {
 
-  if(!tour) {
-    return res.status(404)
-      .json({
-        status: 'fail',
-        message: "Indvalid Id"
-     })
-  }
+  console.log(req.body)
+  const tour  = await Tour.updateOne(
+    {_id: req.params.id}, 
+    {$set: req.body}
+  )
 
   res.status(200) 
     .json({
       status: 'success',
-      data: {
-        tour: req.body
-      } 
+      data: tour
     })
 }
 
 // DELETE
-exports.deleteTour =(req, res) => {
+exports.deleteOneTour = async (req, res) => {
 
-  const tour = tours.find(t => t.id === parseInt(req.params.id))
-
-  if(!tour) {
-    return res.status(404)
-      .json({
-        status: 'fail',
-        message: "Indvalid Id"
-     })
-  }
+  const tour = await Tour.deleteOne({_id: req.params.id})
 
   res.status(204)
     .json({
@@ -113,3 +75,13 @@ exports.deleteTour =(req, res) => {
     })
 }
 
+exports.deleteManyTour =  async (req, res) => {
+  
+  const tour = await Tour.deleteMany(req.body)
+
+  res.status(204)
+    .json({
+      status: 'success',
+      data: tour
+    })
+}
