@@ -1,6 +1,5 @@
 const express = require('express')
 const morgan = require('morgan')
-const fs = require('fs')
 
 const app = express()
 
@@ -16,7 +15,7 @@ app.use(express.static(`public`))
 const userRouter = require(`./routes/users`)
 const tourRouter = require(`./routes/tours`)
 
-app.use('/users', userRouter)
-app.use('/tours', tourRouter)
+app.use('/api/users', userRouter)
+app.use('/api/tours', tourRouter)
 
 module.exports = app
