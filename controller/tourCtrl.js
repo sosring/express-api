@@ -8,8 +8,17 @@ exports.checkId = async (req, res, next, val) => {
 // GET 
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find()
+    const queryObj = {...req.query}
+    const excludedFields = ['name','page', 'sort', 'limit', 'fields']
 
+    // Ecluding Fields 
+    excludedFields.forEach(el => delete queryObj[el]) 
+
+    // Advance Filtering
+    let queryStr = JSON.stringify(queryObj)
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`); 
+
+    const tours = await Tour.find(JSON.parse(queryStr))
     res.status(200)
      .json({
        status: 'success',
