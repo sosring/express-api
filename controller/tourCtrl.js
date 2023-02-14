@@ -8,31 +8,37 @@ exports.checkId = async (req, res, next, val) => {
 // GET 
 exports.getAllTours = async (req, res) => {
   try {
-
-    // Excluding Fields so that it doesn't popular in find() func
+    // Excluding fields
     const queryObj = {...req.query}
-    const excludedFields = ['name','page', 'limit', 'sort', 'fields']
-    excludedFields.forEach(el => delete queryObj[el]) 
-    console.log(queryObj)
+    const excludedFields = ['name', 'page', 'fields', 'limit', 'sort']
+    excludedFields.forEach(el => delete queryObj[el])
 
-    // Advance Filtering 
-    let queryStr = JSON.stringify(queryObj)
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`); 
-    console.log(JSON.parse(queryStr))
+    // Advance filtering
+    let queryStr =  JSON.stringify(queryObj) 
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
 
-    let query = await Tour.find(JSON.parse(queryStr)).sort('-createdAt')
+    let query = Tour.find(JSON.parse(queryStr))
 
-    // Sorting
     if(req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ')
-      query = await Tour.find(JSON.parse(queryStr)).sort(sortBy)
+      const sortBy = req.query.sort.split(',').join(' ') // to add mutiple sort query
+      query = query.sort(sortBy)
+    }
+    else {
+      query = query.sort('-createAt')
     }
 
-    // Field limiting
+    // Limiting fields
     if(req.query.fields) {
       const fields = req.query.fields.split(',').join(' ')
-      query = await Tour.find(JSON.parse(queryStr)).select(fields) 
+      query = query.select(fields)
     }
+
+    // Pagination
+    const page = req.query.page || 1 
+    const limit = req.query.limit || 0
+    const skip = (page - 1) * limit
+
+    query = query.skip(skip).limit(limit)
 
     const tours = await query 
     res.status(200)
