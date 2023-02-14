@@ -8,17 +8,33 @@ exports.checkId = async (req, res, next, val) => {
 // GET 
 exports.getAllTours = async (req, res) => {
   try {
+
+    // Excluding Fields so that it doesn't popular in find() func
     const queryObj = {...req.query}
-    const excludedFields = ['name','page', 'sort', 'limit', 'fields']
-
-    // Ecluding Fields 
+    const excludedFields = ['name','page', 'limit', 'sort', 'fields']
     excludedFields.forEach(el => delete queryObj[el]) 
+    console.log(queryObj)
 
-    // Advance Filtering
+    // Advance Filtering 
     let queryStr = JSON.stringify(queryObj)
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`); 
+    console.log(JSON.parse(queryStr))
 
-    const tours = await Tour.find(JSON.parse(queryStr))
+    let query = await Tour.find(JSON.parse(queryStr)).sort('-createdAt')
+
+    // Sorting
+    if(req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ')
+      query = await Tour.find(JSON.parse(queryStr)).sort(sortBy)
+    }
+
+    // Field limiting
+    if(req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ')
+      query = await Tour.find(JSON.parse(queryStr)).select(fields) 
+    }
+
+    const tours = await query 
     res.status(200)
      .json({
        status: 'success',
