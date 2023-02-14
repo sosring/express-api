@@ -15,7 +15,7 @@ app.use(express.static(`public`))
 const userRouter = require(`./routes/users`)
 const tourRouter = require(`./routes/tours`)
 
-app.use('/api/users', userRouter)
 app.use('/api/tours', tourRouter)
+app.use('/api/users', userRouter)
 
 module.exports = app
