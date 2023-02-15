@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const slugify = require('slugify')
 
 const tourSchema = new Schema({
   name: {
@@ -49,7 +50,48 @@ const tourSchema = new Schema({
     type: Date,
     default: Date.now()
   },
-  startDates: [Date]
+  startDates: [Date],
+  secretTour: {
+    type: Boolean,
+    default: false
+  }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+})
+
+tourSchema.virtual('durationWeeks').get(function() {
+  return this.duration / 7
+})
+
+// Document Middleware: runs before .save() and .create() .insertMany()
+tourSchema.pre('save', function(next) {
+  this.slug = slugify(this.name, { lower: true })
+  next()
+})
+
+tourSchema.post('save', function(doc, next) {
+  console.log(doc)
+  next()
+})
+
+tourSchema.pre(/^find/, function(next) {
+  this.find({ secretTour: { $ne: true }})
+
+  this.start = Date.now()
+  next()
+})
+
+tourSchema.post(/^find/, function(doc, next) {
+  console.log(`Query took ${Date.now() - this.start} ms`)
+  next()
+})
+
+// Aggregation Middleware
+tourSchema.pre('aggregate', function(next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true }} })
+  console.log(this.pipeline())
+  next()
 })
 
 module.exports = model('tours', tourSchema)
