@@ -5,23 +5,33 @@ const tourSchema = new Schema({
   name: {
     type: String,
     required: [true, 'A tour must have a name'],
-    unique: true
+    unique: true,
+    trim: true,
+    maxlength: [40, 'A tour name must have less or equal than 40 characters'],
+    minlength: [10, 'A tour name must have more or equal than 10 characters']
   },
   duration: {
     type: Number,
     required: [true, 'A tour must have a duration']
   },
+  slug: String,
   maxGroupSize: {
     type: Number,
     required: [true, 'A tour must have a group size']
   },
   difficulty: {
     type: String,
-    required: [true, 'A tour must have a difficulty']
+    required: [true, 'A tour must have a difficulty'],
+    enum: {
+      values: ["easy", "medium", 'difficult'],
+      messages: 'Difficulty is either easy, medium, difficult' 
+    }
   },
   ratingAverage: {
     type: Number,
-    default: 4.5
+    default: 4.5,
+    min: [1, 'Rating must be above 1'],
+    max: [5, 'Rating must be below 5']
   },
   ratingQuantity: {
     type: Number,
@@ -31,11 +41,19 @@ const tourSchema = new Schema({
     type: Number,
     required: [true, 'A tour must have a price']
   },
-  priceDiscount:  Number,
+  priceDiscount:  {
+    type: Number,
+    validate: {
+      validator: function (val) {
+        return val < this.price
+      },
+      message: 'Discount price ({VALUE}) should be below regular price'
+    }
+  },
   summary: {
     type: String,
-    trim: true,
-    required: [true, 'A tour must have a description']
+    required: [true, 'A tour must have a description'],
+    trim: true
   },
   description: {
     type: String,
