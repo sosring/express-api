@@ -1,5 +1,7 @@
 const Tour = require('../models/tourModel')
 const APIFeatures = require('../utils/apiFeatures')
+const AppError = require('../utils/appError')
+const catchAsync = require('../utils/catchAsync')
 
 // MiddleWare
 exports.aliasTopTours = (req, res, next) => {
@@ -11,8 +13,7 @@ exports.aliasTopTours = (req, res, next) => {
 }
 
 // GET 
-exports.getAllTours = async (req, res) => {
-  try {
+exports.getAllTours = catchAsync(async (req, res, next) => {
     // Execute Query
     const features = new APIFeatures(Tour.find(), req.query)
     features
@@ -29,59 +30,37 @@ exports.getAllTours = async (req, res) => {
        results: tours.length,
        data: tours 
      })
-  }
-  catch (err) {
-    res.status(404)
-      .json({
-        status: 'fail',
-        message: err.message
-      })
-  }
-}
+})
 
-exports.getTour = async (req, res) => {
- try {
+exports.getTour = catchAsync(async (req, res, next) => {
+
   const tour = await Tour.findById(req.params.id) 
+
+  if(!tour) {
+    return next(new AppError('No tour found with that ID', 404))
+  }
 
   res.status(200)
    .json({
      status: 'success',
      data: tour
    })
- }
-  catch (err) {
-    res.status(404)
-      .json({
-        status: 'fail',
-        message: err.message
-      })
-  }
-}
+})
 
 // POST 
-exports.createTour = async (req, res) => {
+exports.createTour = catchAsync(async (req, res, next) => {
 
- try {
   const newTour = await Tour.create(req.body)
   res.status(201)
     .json({
       status: 'success',
       data: newTour
     })
- }
- catch (err) {
-   res.status(404) 
-     .json({
-       status: 'fail',
-       message: err.message
-     })
- }
-}
+})
 
 // PATCH
-exports.updateTour = async (req, res) => {
+exports.updateTour = catchAsync(async (req, res, next) => {
 
- try {
   const tour  = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true
   })
@@ -91,19 +70,11 @@ exports.updateTour = async (req, res) => {
       status: 'success',
       data: tour
     })
- }
- catch (err) {
-    res.status(404)
-      .json({
-        status: 'fail',
-        message: err.message
-      })
-  }
-}
+})
 
 // DELETE
-exports.deleteOneTour = async (req, res) => {
-  try {
+exports.deleteOneTour = catchAsync(async (req, res, next) => {
+
     const tour = await Tour.findByIdAndDelete(req.params.id)
 
     res.status(204)
@@ -111,18 +82,10 @@ exports.deleteOneTour = async (req, res) => {
         status: 'success',
         data: tour 
       })
-  }
-  catch (err) {
-    res.status(404)
-      .json({
-        status: 'fail',
-        message: err.message
-      })
-  }
-}
+})
 
-exports.deleteManyTour =  async (req, res) => {
-  try {
+exports.deleteManyTour =  catchAsync(async (req, res, next) => {
+
     const tour = await Tour.deleteMany(req.body)
 
     res.status(204)
@@ -130,18 +93,10 @@ exports.deleteManyTour =  async (req, res) => {
         status: 'success',
         data: tour
       })
-  }
-  catch (err) {
-    res.status(404)
-      .json({
-        status: 'fail',
-        message: err.message
-      })
-  }
-}
+})
 
-exports.getTourStats = async (req, res) => {
-  try {
+exports.getTourStats = catchAsync(async (req, res, next) => {
+
     const stats = await Tour.aggregate([
       {
         $match: { ratingAverage: { $gte: 4.5 }}
@@ -170,18 +125,9 @@ exports.getTourStats = async (req, res) => {
         status: 'success',
         data: stats 
     })
-  }
-  catch(err) {
-    res.status(500)
-      .json({
-        status: 'fail',
-        message: err.message
-      })
-  }
-}
+})
 
-exports.getMontlyPlan = async (req, res) => {
-  try {
+exports.getMontlyPlan = catchAsync(async (req, res, next) => {
     const year = parseInt(req.params.year)
 
     const plan = await Tour.aggregate([
@@ -222,12 +168,4 @@ exports.getMontlyPlan = async (req, res) => {
         results: plan.length,
         data: plan 
     })
-  }
-  catch(err) {
-    res.status(500)
-      .json({
-        status: 'fail',
-        message: err.message
-      })
-  }
-}
+})
