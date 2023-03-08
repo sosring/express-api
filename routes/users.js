@@ -4,7 +4,7 @@ const { getAllUser, createUser, getUser, patchUser, deleteUser } = require('../c
 const { signup, login }= require('../controller/authCtrl')
 
 router.post('/signup', signup)
-router.post('/login', login)
+router.post('/login', )
 
 router.route('')
    .get(getAllUser)

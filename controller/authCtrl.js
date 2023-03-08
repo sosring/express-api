@@ -55,3 +55,23 @@ exports.login = catchAsync(async (req, res, next) => {
       token
     })
 })
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // Get token and check if it exist
+  let token;
+  if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1]
+  }
+  console.log(token)
+  
+  // Validate token
+  if(!token) {
+    next(new AppError('You are not login. Please log in to get access', 404))
+  }
+  
+  // Check if user still exist
+
+  // Check if user changed password after the token was issued
+
+  next()
+})
