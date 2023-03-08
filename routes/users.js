@@ -1,9 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const { getAllUser, createUser, getUser, patchUser, deleteUser } = require('../controller/userCtrl')
-const { signup }= require('../controller/authCtrl')
+const { signup, login }= require('../controller/authCtrl')
 
 router.post('/signup', signup)
+router.post('/login', login)
 
 router.route('')
    .get(getAllUser)

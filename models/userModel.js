@@ -20,7 +20,8 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8
+    minlength: 8,
+    select: false
   },
   passwordConfirm: {
     type: String,
@@ -42,5 +43,11 @@ UserSchema.pre('save', async function(next){
   this.passwordConfirm = undefined
   next()
 })
+
+UserSchema.methods.correctPassword = async function(candidatePassword, userPassword)  {
+  // candidatePassword is from the user
+  // userPassword is from the server which is hash
+  return await bcrypt.compare(candidatePassword, userPassword)
+}
 
 module.exports = model('Users', UserSchema)
