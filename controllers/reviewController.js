@@ -3,7 +3,7 @@ const AppError = require('../utils/appError')
 const catchAsync = require('../utils/catchAsync')
 
 exports.getMyReview = catchAsync(async (req, res, next) => {
-  const reviews = await Review.findOne({user: req.user._id})
+  const reviews = await Review.find({user: req.user._id})
 
   if(!reviews) {
     return next(new AppError("You don't have any reviews!", 400))
@@ -12,6 +12,7 @@ exports.getMyReview = catchAsync(async (req, res, next) => {
   res.status(200)
     .json({
       status: 'success', 
+      results: reviews.length,
       data: {
         reviews
       }
@@ -20,16 +21,17 @@ exports.getMyReview = catchAsync(async (req, res, next) => {
 
 exports.getTourReview = catchAsync(async (req, res, next) => {
   // Get review by user ref && tour ref
-  const reviews = await Review.findOne({tour: req.params.id}) 
+  const reviews = await Review.find({tour: req.params.id}) 
 
   // Send error if there is no review 
   if(!reviews) {
-    return next(new AppError('Theres no review!', 400))
+    return next(new AppError('There are no review on the tour!', 400))
   }
 
   res.status(200)
     .json({
       status: 'success', 
+      results: reviews.length,
       data: {
         reviews
       }
