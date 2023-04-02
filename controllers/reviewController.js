@@ -21,7 +21,7 @@ exports.getMyReview = catchAsync(async (req, res, next) => {
 
 exports.getTourReview = catchAsync(async (req, res, next) => {
   // Get review by user ref && tour ref
-  const reviews = await Review.find({tour: req.params.id}) 
+  const reviews = await Review.find({ tour: req.params.id }) 
 
   // Send error if there is no review 
   if(!reviews) {

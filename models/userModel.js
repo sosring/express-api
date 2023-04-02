@@ -2,11 +2,16 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const slugify = require('slugify')
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstname: {
     type: String,
-    required: [true, 'Please tell us your name!']
+    required: [true, 'Please tell us your firstname!']
+  },
+  lastname: {
+    type: String,
+    required: [true, 'Please tell us your lastname!']
   },
   email: {
     type: String,
@@ -15,7 +20,10 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
-  photo: String,
+  photo: {
+    type: String,
+    default: 'https://api.dicebear.com/6.x/thumbs/svg?seed=anika'
+  },
   role: {
     type: String,
     enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -27,6 +35,7 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     select: false
   },
+  slug: String,
   passwordConfirm: {
     type: String,
     required: [true, 'Please confirm your password'],
@@ -47,6 +56,12 @@ const userSchema = new mongoose.Schema({
     select: false
   } 
 });
+
+userSchema.pre('save', async function(next) {
+  const fullname = `${this.firstname} ${this.lastname}`
+  this.slug = slugify(fullname, { lower: true })
+  next()
+})
 
 userSchema.pre('save', async function(next) {
   // Only run this function if password was actually modified

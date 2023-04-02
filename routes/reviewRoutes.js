@@ -8,10 +8,10 @@ router.route('/:id')
 
 // Only logedIn user can access these routes 
 router.use(authController.protect)
-router.post('/create', reviewController.postReview)
 
 // For a user's reviews 
 router.route('/')
   .get(reviewController.getMyReview)
+  .post(reviewController.postReview)
 
 module.exports = router
