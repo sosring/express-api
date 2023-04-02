@@ -48,3 +48,13 @@ exports.postReview = catchAsync(async (req, res, next) => {
       review
     })
 }) 
+
+exports.updateReview = catchAsync(async (req, res, next) => {
+  // Check if the post user is same with the loged in user
+  
+  res.status(201)
+    .json({
+      status: 'success',
+      review
+    })
+})
