@@ -1,27 +1,48 @@
-const { Schema, model } = require('mongoose')
+const mongoose = require('mongoose')
 
 // review / rating / createdAt / ref to tour / ref to user
 
-const reviewSchema = new Schema({
+const reviewSchema = new mongoose.Schema({
   review: {
     type: String,
     trim: true,
-    required: [true, "Review can't be upload if its empty!"]
+    maxlength: [300, 'Review should be under 300 letters!'],
+    required: [true, "Review can not be empty!"]
   },
   rating: {
     type: Number,
-    default: 1,
-    required: [true, 'A review must have a rating!']
+    min: 1,
+    max: 5,
+    default: 1
   },
-  createdAt: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now()
+  },
   tour: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Tour'
+    ref: 'Tour',
+    required: [true, 'Review must belong to a tour.']
   },
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: [true, 'Review must belong to a user.']
   }
+ },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+ }
+)
+
+reviewSchema.pre(/^find/, function(next) {
+  this.populate({
+      path: 'user',
+      select: '-__v -passwordChangedAt'
+    })
+
+  next()
 })
 
-module.exports = model('Review', reviewSchema)
+module.exports = mongoose.model('Review', reviewSchema)
