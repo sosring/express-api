@@ -1,11 +1,12 @@
 const Review = require('../models/reviewModel')
 const AppError = require('../utils/appError')  
 const catchAsync = require('../utils/catchAsync')
+const factory = require('../controllers/handlerFactory')
 
 exports.getAllReview = catchAsync(async (req, res, next) => {
 
   let filterObj = {}
-  if(req.params.tourId) filterObj = { tour: req.parmas.tourId}
+  if(req.params.tourId) filterObj = { tour: req.params.tourId}
   const reviews = await Review.find(filterObj)
 
   if(!reviews) {
@@ -22,27 +23,6 @@ exports.getAllReview = catchAsync(async (req, res, next) => {
     })
 })
 
-exports.createReview = catchAsync(async (req, res, next) => {
-
-  // if !(req.body user && tour) == then set them explicitly 
-  if(!req.body.tour) req.body.tour = req.params.tourId
-  if(!req.body.user) req.body.user = req.user._id
-
-  const review = await Review.create(req.body)
-
-  res.status(201)
-    .json({
-      status: 'success',
-      review
-    })
-}) 
-
-exports.updateReview = catchAsync(async (req, res, next) => {
-  // Check if the post user is same with the loged in user
-  
-  res.status(201)
-    .json({
-      status: 'success',
-      review
-    })
-})
+exports.createReview = factory.createOne(Review)
+exports.deleteReview = factory.deleteOne(Review)
+exports.updateReview = factory.updateOne(Review)

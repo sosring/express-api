@@ -1,6 +1,7 @@
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const factory = require('../controllers/handlerFactory')
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {}
@@ -49,7 +50,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     })
 })
 
-exports.deleteMe = catchAsync(async (req, res, next) => {
+exports.deactive = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { isActive: false }) 
 
   res.status(204)
@@ -58,3 +59,5 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
       data: null
     })
 })
+
+exports.deleteUser = factory.deleteOne(User)
