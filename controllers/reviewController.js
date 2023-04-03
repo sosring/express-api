@@ -2,8 +2,11 @@ const Review = require('../models/reviewModel')
 const AppError = require('../utils/appError')  
 const catchAsync = require('../utils/catchAsync')
 
-exports.getMyReview = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find({user: req.user._id})
+exports.getAllReview = catchAsync(async (req, res, next) => {
+
+  let filterObj = {}
+  if(req.params.tourId) filterObj = { tour: req.parmas.tourId}
+  const reviews = await Review.find(filterObj)
 
   if(!reviews) {
     return next(new AppError("You don't have any reviews!", 400))
@@ -19,27 +22,12 @@ exports.getMyReview = catchAsync(async (req, res, next) => {
     })
 })
 
-exports.getTourReview = catchAsync(async (req, res, next) => {
-  // Get review by user ref && tour ref
-  const reviews = await Review.find({ tour: req.params.id }) 
+exports.createReview = catchAsync(async (req, res, next) => {
 
-  // Send error if there is no review 
-  if(!reviews) {
-    return next(new AppError('There are no review on the tour!', 400))
-  }
+  // if !(req.body user && tour) == then set them explicitly 
+  if(!req.body.tour) req.body.tour = req.params.tourId
+  if(!req.body.user) req.body.user = req.user._id
 
-  res.status(200)
-    .json({
-      status: 'success', 
-      results: reviews.length,
-      data: {
-        reviews
-      }
-    })
-})
-
-exports.postReview = catchAsync(async (req, res, next) => {
-  // All the data will be from frontend user id and tour id
   const review = await Review.create(req.body)
 
   res.status(201)
