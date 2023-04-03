@@ -10,7 +10,6 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
-const reviewRouter = require('./routes/reviewRoutes')
 
 const app = express();
 
@@ -53,7 +52,6 @@ app.use(express.static(`${__dirname}/public`));
 // ROUTES
 app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
-app.use('/api/reviews', reviewRouter);
 
 // Test middleware
 app.all('*', (req, res, next) => {

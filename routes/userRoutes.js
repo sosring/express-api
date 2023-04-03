@@ -16,8 +16,16 @@ router.patch('/updateMyPassword',
 router.patch('/updateMe',
    authController.protect, userController.updateMe)
 
-router.delete('/deleteMe',
-   authController.protect, userController.deleteMe)
+router.delete('/deactive',
+   authController.protect, userController.deactive)
+
+router.route('/:id')
+  .delete(authController.protect,
+     authController.restrictTo('admin'),
+     userController.deleteUser)
+  .get(authController.protect,
+     authController.restrictTo('admin'),
+     userController.getUser)
 
 router.route('/')
   .get(userController.getAllUsers)
