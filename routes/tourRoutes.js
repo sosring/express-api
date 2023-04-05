@@ -16,6 +16,12 @@ router
 router.route('/tour-stats').get(tourController.getTourStats);
 router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
+// Query under geographic location
+/*
+router.route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getTourWithin)
+*/
+
 router
   .route('/')
   .get(authController.protect,

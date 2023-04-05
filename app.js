@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path')
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
@@ -13,8 +14,11 @@ const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
-// Global Middleware
+// Template engine
+app.set('view engine', 'pug')
+app.set('views', path.join(__dirname, 'views'))
 
+// Global Middleware
 // Set security HTTP headers
 app.use(helmet())
 
@@ -32,6 +36,9 @@ const limiter = rateLimit({
 
 app.use('/api', limiter)
 
+// serving static files
+app.use(express.static(`${__dirname}/public`)); 
+
 // Body parser
 app.use(express.json({ limit: '10kb' }))
 
@@ -46,10 +53,13 @@ app.use(hpp({
   whitelist: ['duration', 'ratingQuantity', 'ratingsAverage', 'maxGroupSize',  'difficulty', 'price']
 }))
 
-// serving static files
-app.use(express.static(`${__dirname}/public`));
-
 // ROUTES
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: 'Hello Nigga'
+  })
+})
+
 app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
 
