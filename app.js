@@ -11,6 +11,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const viewRouter = require('./routes/viewRoutes')
 
 const app = express();
 
@@ -54,12 +55,8 @@ app.use(hpp({
 }))
 
 // ROUTES
-app.get('/', (req, res) => {
-  res.status(200).render('base', {
-    tour: 'Hello Nigga'
-  })
-})
 
+app.use('/', viewRouter)
 app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
 

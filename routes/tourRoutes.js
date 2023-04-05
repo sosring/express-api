@@ -24,8 +24,7 @@ router.route('/tours-within/:distance/center/:latlng/unit/:unit')
 
 router
   .route('/')
-  .get(authController.protect,
-     tourController.getAllTours)
+  .get(tourController.getAllTours)
   .post(tourController.createTour);
 
 router
