@@ -13,6 +13,11 @@ exports.deactive = catchAsync(async (req, res, next) => {
     })
 })
 
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user._id
+  next()
+}
+
 exports.getAllUsers = factory.getAll(User)
 exports.getUser = factory.getOne(User)
 exports.updateMe = factory.updateOne(User)

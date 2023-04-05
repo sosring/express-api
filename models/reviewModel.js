@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Tour = require('../models/tourModel')
 
 // review / rating / createdAt / ref to tour / ref to user
 
@@ -45,4 +46,42 @@ reviewSchema.pre(/^find/, function(next) {
   next()
 })
 
-module.exports = mongoose.model('Review', reviewSchema)
+// This function is on the Model
+reviewSchema.statics.calAvgRatings = async function(tourId) {
+
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId }
+    },
+    {
+      $group: { 
+        _id: '$tour',
+        numRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' }
+      }
+    }
+  ])
+
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsQuantity: stats[0].numRating,
+    ratingsAverage: stats[0].avgRating
+  })
+}
+ 
+reviewSchema.post('save', function() {
+  // this is corrent doc and constructor is the Model
+  this.constructor.calAvgRatings(this.tour)
+})
+
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  this.review = await this.findOne()
+  next()
+})
+
+reviewSchema.post(/^findOneAnd/, async function() {
+  // this.findOne() doesn't work here, query has already executed
+  await this.review.constructor.calAvgRatings(this.review.tour)
+})
+
+const Review = mongoose.model('Review', reviewSchema)
+module.exports = Review

@@ -24,7 +24,8 @@ exports.getAll = Model => catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate();
-  const doc = await features.query;
+
+  const doc = await features.query
 
   if(!doc) {
     return next(new AppError("You don't have any document!", 400))
@@ -80,19 +81,20 @@ exports.updateOne = Model => catchAsync(async (req, res, next) => {
   }
 
   // Filtered out unwanted fields names that are not allowed to be updated
-  const filteredBody = filterObj(req.body, 'firstname', 'lastname','email', 'photo', 'review')
-  console.log(filteredBody)
-  
+  const filteredBody = filterObj(req.body, 'firstname', 'lastname','email', 'photo', 'review', 'rating')
 
   // Update the user document
   let query 
+
+  // To update to doc  
   query = Model.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true, // to trigger this.isNew
     runValidators: true
   })
 
+  // To update reviews 
   if(req.params.id) { // Id from Review nested routes 
-    query = Model.findById(req.params.id,filteredBody, {
+    query = Model.findByIdAndUpdate(req.params.id, filteredBody, {
       new: true, // to trigger this.isNew
       runValidators: true
     })
@@ -108,16 +110,6 @@ exports.updateOne = Model => catchAsync(async (req, res, next) => {
     .json({
       status: 'success',
       data: doc 
-    })
-})
-
-exports.deactive = catchAsync(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user.id, { isActive: false }) 
-
-  res.status(204)
-    .json({
-      status: 'success',
-      data: null
     })
 })
 

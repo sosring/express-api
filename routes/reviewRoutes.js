@@ -14,7 +14,8 @@ router.route('/')
      authController.restrictTo('user'),
      reviewController.createReview)
 
-router.use(authController.protect, authController.restrictTo('user'))
+router.use(authController.protect, 
+   authController.restrictTo('user'))
 
 router.route('/:id')
   .delete(reviewController.deleteReview)

@@ -9,25 +9,27 @@ router.post('/login', authController.login);
 
 router.patch('/forgetPassword', authController.forgetPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-router.patch('/updateMyPassword',
-   authController.protect, 
-   authController.updatePassword)
-
-router.patch('/updateMe',
-   authController.protect, userController.updateMe)
-
-router.delete('/deactive',
-   authController.protect, userController.deactive)
-
-router.route('/:id')
-  .delete(authController.protect,
-     authController.restrictTo('admin'),
-     userController.deleteUser)
-  .get(authController.protect,
-     authController.restrictTo('admin'),
-     userController.getUser)
 
 router.route('/')
   .get(userController.getAllUsers)
+
+// Protect Middleware
+router.use(authController.protect)
+
+router.patch('/updateMyPassword', authController.updatePassword)
+
+router.get('/me', 
+   userController.getMe, 
+   userController.getUser)
+
+router.patch('/updateMe', userController.updateMe)
+router.delete('/deactive', userController.deactive)
+
+// Restrict Middleware
+router.use(authController.restrictTo('admin'))
+
+router.route('/:id')
+  .delete(userController.deleteUser)
+  .get(userController.getUser)
 
 module.exports = router;
