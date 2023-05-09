@@ -1,7 +1,18 @@
-const router = require('express').Router()
-const viewController = require('../controllers/viewController')
+const express = require('express');
+const viewsController = require('../controllers/viewsController');
+const authController = require('../controllers/authController');
 
-router.get('/', viewController.getOverview)
-router.get('/tour/:slug', viewController.getTour) 
+const router = express.Router();
 
-module.exports = router
+router.get('/', viewsController.getOverview);
+router.get('/tour/:slug', viewsController.getTour);
+router.get('/login', viewsController.getLoginForm);
+router.get('/me', viewsController.getAccount);
+
+router.post(
+  '/submit-user-data',
+  authController.protect,
+  viewsController.updateUserData
+);
+
+module.exports = router;
